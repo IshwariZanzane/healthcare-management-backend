@@ -21,6 +21,7 @@ public class DoctorController{
     public List<DoctorResponseDTO> getAllDoctors(){
         return doctorService.getAllDoctors();
     }
+
     @GetMapping("/doctors/{doctorId}")
     public DoctorResponseDTO getDoctorById(@PathVariable long doctorId){
         return doctorService.getDoctorById(doctorId);
@@ -35,6 +36,7 @@ public class DoctorController{
     public DoctorResponseDTO updateDoctor(@PathVariable long doctorId, @Valid @RequestBody DoctorRequestDTO request){
         return doctorService.updateDoctor(doctorId,request);
     }
+
     @DeleteMapping("/doctors/{doctorId}")
     public void deleteDoctor(@PathVariable long doctorId){
         doctorService.deleteDoctor(doctorId);
