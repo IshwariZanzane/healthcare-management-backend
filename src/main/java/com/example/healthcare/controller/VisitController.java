@@ -25,4 +25,9 @@ public class VisitController{
     public VisitResponseDTO createVisit(@RequestBody VisitRequestDTO request){
         return visitService.createVisit(request);
     }
+
+    @PutMapping("/{visitId}")
+    public VisitResponseDTO updateVisit(@PathVariable long visitId, @RequestBody VisitRequestDTO request){
+        return visitService.updateVisit(visitId,request);
+    }
 }

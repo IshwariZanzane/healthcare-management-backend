@@ -10,4 +10,6 @@ public interface VisitService{
     List<VisitResponseDTO> getAllVisits();
 
     VisitResponseDTO createVisit(VisitRequestDTO request);
+
+    VisitResponseDTO updateVisit(long visitId, VisitRequestDTO request);
 }

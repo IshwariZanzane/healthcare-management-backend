@@ -90,5 +90,50 @@ public class VisitServiceImpl implements VisitService{
         return response;
     }
 
+    @Override
+    public VisitResponseDTO updateVisit(long visitId, VisitRequestDTO request){
+        Optional<Visit> visit=visitRepository.findById(visitId);
+        if(visit.isPresent()){
+            Patient patient=patientRepository.findById(request.getPatientId())
+                    .orElseThrow(()->new IllegalArgumentException("Patient Doesn't Exist."));
+            Doctor doctor=doctorRepository.findById(request.getDoctorId())
+                    .orElseThrow(()->new IllegalArgumentException("Doctor Doesn't Exist."));
+            Appointment appointment=appointmentRepository.findById(request.getAppointmentId())
+                    .orElseThrow(()->new IllegalArgumentException("Appointment Doesn't Exist."));
+
+            Visit existingVisit=visit.get();
+            existingVisit.setPatient(patient);
+            existingVisit.setDoctor(doctor);
+            existingVisit.setAppointment(appointment);
+            existingVisit.setVisitTime(request.getVisitTime());
+            existingVisit.setWeight(request.getWeight());
+            existingVisit.setHeight(request.getHeight());
+            existingVisit.setBloodPressure(request.getBloodPressure());
+            existingVisit.setSymptoms(request.getSymptoms());
+            existingVisit.setDiagnosis(request.getDiagnosis());
+            existingVisit.setPrescription(request.getPrescription());
+            existingVisit.setNotes(request.getNotes());
+
+            Visit savedVisit=visitRepository.save(existingVisit);
+
+            VisitResponseDTO response=new VisitResponseDTO();
+            response.setVisitId(savedVisit.getVisitId());
+            response.setPatientId(savedVisit.getPatient().getPatientId());
+            response.setDoctorId(savedVisit.getDoctor().getDoctorId());
+            response.setAppointmentId(savedVisit.getAppointment().getAppmtId());
+            response.setVisitTime(savedVisit.getVisitTime());
+            response.setWeight(savedVisit.getWeight());
+            response.setHeight(savedVisit.getHeight());
+            response.setBloodPressure(savedVisit.getBloodPressure());
+            response.setSymptoms(savedVisit.getSymptoms());
+            response.setDiagnosis(savedVisit.getDiagnosis());
+            response.setPrescription(savedVisit.getPrescription());
+            response.setNotes(savedVisit.getNotes());
+
+            return response;
+        }
+        throw new IllegalArgumentException("Visit Doesn't Exist.");
+    }
+
 }
 
