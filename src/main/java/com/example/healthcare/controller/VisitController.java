@@ -1,10 +1,9 @@
 package com.example.healthcare.controller;
 
+import com.example.healthcare.dto.VisitRequestDTO;
 import com.example.healthcare.dto.VisitResponseDTO;
 import com.example.healthcare.service.VisitService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -20,5 +19,10 @@ public class VisitController{
     @GetMapping("")
     public List<VisitResponseDTO> getAllVisit(){
         return visitService.getAllVisits();
+    }
+
+    @PostMapping("")
+    public VisitResponseDTO createVisit(@RequestBody VisitRequestDTO request){
+        return visitService.createVisit(request);
     }
 }
