@@ -113,8 +113,11 @@ public class VisitServiceImpl implements VisitService{
         VisitResponseDTO response=new VisitResponseDTO();
         response.setVisitId(visit.getVisitId());
         response.setPatientId(visit.getPatient().getPatientId());
+        response.setPatientName(visit.getPatient().getName());
         response.setDoctorId(visit.getDoctor().getDoctorId());
+        response.setDoctorName(visit.getDoctor().getName());
         response.setAppointmentId(visit.getAppointment().getAppmtId());
+        response.setTokenNumber(visit.getAppointment().getTokenNumber());
         response.setVisitTime(visit.getVisitTime());
         response.setWeight(visit.getWeight());
         response.setHeight(visit.getHeight());
