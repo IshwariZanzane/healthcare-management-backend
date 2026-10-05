@@ -11,10 +11,8 @@ import com.example.healthcare.repository.DoctorRepository;
 import com.example.healthcare.repository.PatientRepository;
 import com.example.healthcare.repository.VisitRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class VisitServiceImpl implements VisitService{
@@ -33,26 +31,10 @@ public class VisitServiceImpl implements VisitService{
 
     @Override
     public List<VisitResponseDTO> getAllVisits(){
-        List<Visit> visits=visitRepository.findAll();
-        return visits.stream()
-                .map(visit ->{VisitResponseDTO response = new VisitResponseDTO();
-            response.setVisitId(visit.getVisitId());
-            response.setPatientId(visit.getPatient().getPatientId());
-            response.setDoctorId(visit.getDoctor().getDoctorId());
-            response.setAppointmentId(visit.getAppointment().getAppmtId());
-            response.setVisitTime(visit.getVisitTime());
-            response.setWeight(visit.getWeight());
-            response.setHeight(visit.getHeight());
-            response.setBloodPressure(visit.getBloodPressure());
-            response.setSymptoms(visit.getSymptoms());
-            response.setDiagnosis(visit.getDiagnosis());
-            response.setPrescription(visit.getPrescription());
-            response.setNotes(visit.getNotes());
-            return response;
-            }).toList();
+        return visitRepository.findAll().stream().map(this::toDTO).toList();
     }
 
-    @PostMapping
+    @Override
     public VisitResponseDTO createVisit(VisitRequestDTO request){
         Visit visit = new Visit();
         Patient patient=patientRepository.findById(request.getPatientId())
@@ -73,66 +55,75 @@ public class VisitServiceImpl implements VisitService{
         visit.setPrescription(request.getPrescription());
         visit.setNotes(request.getNotes());
 
-        Visit savedVisit=visitRepository.save(visit);
-
-        VisitResponseDTO response = new VisitResponseDTO();
-        response.setPatientId(savedVisit.getPatient().getPatientId());
-        response.setDoctorId(savedVisit.getDoctor().getDoctorId());
-        response.setAppointmentId(savedVisit.getAppointment().getAppmtId());
-        response.setVisitTime(savedVisit.getVisitTime());
-        response.setWeight(savedVisit.getWeight());
-        response.setHeight(savedVisit.getHeight());
-        response.setBloodPressure(savedVisit.getBloodPressure());
-        response.setSymptoms(savedVisit.getSymptoms());
-        response.setDiagnosis(savedVisit.getDiagnosis());
-        response.setPrescription(savedVisit.getPrescription());
-        response.setNotes(savedVisit.getNotes());
-        return response;
+        return toDTO(visitRepository.save(visit));
     }
 
     @Override
     public VisitResponseDTO updateVisit(long visitId, VisitRequestDTO request){
-        Optional<Visit> visit=visitRepository.findById(visitId);
-        if(visit.isPresent()){
-            Patient patient=patientRepository.findById(request.getPatientId())
-                    .orElseThrow(()->new IllegalArgumentException("Patient Doesn't Exist."));
-            Doctor doctor=doctorRepository.findById(request.getDoctorId())
-                    .orElseThrow(()->new IllegalArgumentException("Doctor Doesn't Exist."));
-            Appointment appointment=appointmentRepository.findById(request.getAppointmentId())
-                    .orElseThrow(()->new IllegalArgumentException("Appointment Doesn't Exist."));
+        Visit existingVisit=visitRepository.findById(visitId)
+                .orElseThrow(()->new IllegalArgumentException("Visit Doesn't Exist."));
+        Patient patient=patientRepository.findById(request.getPatientId())
+                .orElseThrow(()->new IllegalArgumentException("Patient Doesn't Exist."));
+        Doctor doctor=doctorRepository.findById(request.getDoctorId())
+                .orElseThrow(()->new IllegalArgumentException("Doctor Doesn't Exist."));
+        Appointment appointment=appointmentRepository.findById(request.getAppointmentId())
+                .orElseThrow(()->new IllegalArgumentException("Appointment Doesn't Exist."));
 
-            Visit existingVisit=visit.get();
-            existingVisit.setPatient(patient);
-            existingVisit.setDoctor(doctor);
-            existingVisit.setAppointment(appointment);
-            existingVisit.setVisitTime(request.getVisitTime());
-            existingVisit.setWeight(request.getWeight());
-            existingVisit.setHeight(request.getHeight());
-            existingVisit.setBloodPressure(request.getBloodPressure());
-            existingVisit.setSymptoms(request.getSymptoms());
-            existingVisit.setDiagnosis(request.getDiagnosis());
-            existingVisit.setPrescription(request.getPrescription());
-            existingVisit.setNotes(request.getNotes());
+        existingVisit.setPatient(patient);
+        existingVisit.setDoctor(doctor);
+        existingVisit.setAppointment(appointment);
+        existingVisit.setVisitTime(request.getVisitTime());
+        existingVisit.setWeight(request.getWeight());
+        existingVisit.setHeight(request.getHeight());
+        existingVisit.setBloodPressure(request.getBloodPressure());
+        existingVisit.setSymptoms(request.getSymptoms());
+        existingVisit.setDiagnosis(request.getDiagnosis());
+        existingVisit.setPrescription(request.getPrescription());
+        existingVisit.setNotes(request.getNotes());
 
-            Visit savedVisit=visitRepository.save(existingVisit);
+        return toDTO(visitRepository.save(existingVisit));
+    }
 
-            VisitResponseDTO response=new VisitResponseDTO();
-            response.setVisitId(savedVisit.getVisitId());
-            response.setPatientId(savedVisit.getPatient().getPatientId());
-            response.setDoctorId(savedVisit.getDoctor().getDoctorId());
-            response.setAppointmentId(savedVisit.getAppointment().getAppmtId());
-            response.setVisitTime(savedVisit.getVisitTime());
-            response.setWeight(savedVisit.getWeight());
-            response.setHeight(savedVisit.getHeight());
-            response.setBloodPressure(savedVisit.getBloodPressure());
-            response.setSymptoms(savedVisit.getSymptoms());
-            response.setDiagnosis(savedVisit.getDiagnosis());
-            response.setPrescription(savedVisit.getPrescription());
-            response.setNotes(savedVisit.getNotes());
+    @Override
+    public VisitResponseDTO getVisitById(long visitId){
+        Visit visit=visitRepository.findById(visitId)
+                .orElseThrow(()->new IllegalArgumentException("Visit Doesn't Exist."));
+        return toDTO(visit);
+    }
 
-            return response;
+    @Override
+    public List<VisitResponseDTO> getVisitsByPatient(long patientId){
+        return visitRepository.getByPatient_PatientId(patientId).stream().map(this::toDTO).toList();
+    }
+
+    @Override
+    public List<VisitResponseDTO> getVisitsByDoctor(long doctorId){
+        return visitRepository.getByDoctor_DoctorId(doctorId).stream().map(this::toDTO).toList();
+    }
+
+    @Override
+    public void deleteVisit(long visitId){
+        if(!visitRepository.existsById(visitId)){
+            throw new IllegalArgumentException("Visit Doesn't Exist.");
         }
-        throw new IllegalArgumentException("Visit Doesn't Exist.");
+        visitRepository.deleteById(visitId);
+    }
+
+    private VisitResponseDTO toDTO(Visit visit){
+        VisitResponseDTO response=new VisitResponseDTO();
+        response.setVisitId(visit.getVisitId());
+        response.setPatientId(visit.getPatient().getPatientId());
+        response.setDoctorId(visit.getDoctor().getDoctorId());
+        response.setAppointmentId(visit.getAppointment().getAppmtId());
+        response.setVisitTime(visit.getVisitTime());
+        response.setWeight(visit.getWeight());
+        response.setHeight(visit.getHeight());
+        response.setBloodPressure(visit.getBloodPressure());
+        response.setSymptoms(visit.getSymptoms());
+        response.setDiagnosis(visit.getDiagnosis());
+        response.setPrescription(visit.getPrescription());
+        response.setNotes(visit.getNotes());
+        return response;
     }
 
 }

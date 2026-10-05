@@ -21,6 +21,21 @@ public class VisitController{
         return visitService.getAllVisits();
     }
 
+    @GetMapping("/{visitId}")
+    public VisitResponseDTO getVisitById(@PathVariable long visitId){
+        return visitService.getVisitById(visitId);
+    }
+
+    @GetMapping("/patient/{patientId}")
+    public List<VisitResponseDTO> getVisitsByPatient(@PathVariable long patientId){
+        return visitService.getVisitsByPatient(patientId);
+    }
+
+    @GetMapping("/doctor/{doctorId}")
+    public List<VisitResponseDTO> getVisitsByDoctor(@PathVariable long doctorId){
+        return visitService.getVisitsByDoctor(doctorId);
+    }
+
     @PostMapping("")
     public VisitResponseDTO createVisit(@RequestBody VisitRequestDTO request){
         return visitService.createVisit(request);
@@ -29,5 +44,10 @@ public class VisitController{
     @PutMapping("/{visitId}")
     public VisitResponseDTO updateVisit(@PathVariable long visitId, @RequestBody VisitRequestDTO request){
         return visitService.updateVisit(visitId,request);
+    }
+
+    @DeleteMapping("/{visitId}")
+    public void deleteVisit(@PathVariable long visitId){
+        visitService.deleteVisit(visitId);
     }
 }
