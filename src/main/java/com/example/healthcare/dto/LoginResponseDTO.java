@@ -5,6 +5,7 @@ public class LoginResponseDTO{
     private long userId;
     private String email;
     private String role;
+    private String token;
 
     public long getUserId(){
         return userId;
@@ -23,5 +24,11 @@ public class LoginResponseDTO{
     }
     public void setRole(String role){
         this.role=role;
+    }
+    public String getToken(){
+        return token;
+    }
+    public void setToken(String token){
+        this.token=token;
     }
 }

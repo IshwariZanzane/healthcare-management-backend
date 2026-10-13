@@ -9,6 +9,8 @@ import com.example.healthcare.repository.UserRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
+import com.example.healthcare.config.JwtUtil;
+
 
 import java.util.List;
 import java.util.Optional;
@@ -18,9 +20,13 @@ public class UserServiceImpl implements UserService{
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final JwtUtil jwtUtil;
 
-    public UserServiceImpl(UserRepository userRepository){
+
+    public UserServiceImpl(UserRepository userRepository,
+                            JwtUtil jwtUtil){
         this.userRepository=userRepository;
+        this.jwtUtil=jwtUtil;
     }
 
     @Override
@@ -106,10 +112,12 @@ public class UserServiceImpl implements UserService{
         if(!passwordEncoder.matches(request.getPassword(), user.getPassword())){
             throw new IllegalArgumentException("Invalid email or password");
         }
+        String token=jwtUtil.generateToken(user.getEmail(), user.getRole());
         LoginResponseDTO response=new LoginResponseDTO();
         response.setUserId(user.getUserId());
         response.setEmail(user.getEmail());
         response.setRole(user.getRole());
+        response.setToken(token);
 
         return response;
     }
